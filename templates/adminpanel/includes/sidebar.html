@@ -1,0 +1,115 @@
+<div class="col-md-2 bg-dark text-white d-flex flex-column p-0 vh-100">
+
+    <!-- Logo -->
+    <div class="text-center py-4 border-bottom border-secondary">
+
+        <h3 class="fw-bold text-white mb-1">
+
+            ZUSA
+
+        </h3>
+
+        <small class="text-secondary">
+
+            Election Administration
+
+        </small>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="list-group list-group-flush flex-grow-1">
+
+        <a href="{% url 'admin_dashboard' %}"
+   class="list-group-item list-group-item-action border-0 py-3
+   {% if active_page == 'dashboard' %}
+       bg-primary text-white
+   {% else %}
+       bg-dark text-white
+   {% endif %}">
+
+    <i class="bi bi-speedometer2 me-2"></i>
+
+    Dashboard
+
+</a>
+
+        <a href="{% url 'admin_elections' %}"
+   class="list-group-item list-group-item-action border-0 py-3
+   {% if active_page == 'elections' %}
+       bg-primary text-white
+   {% else %}
+       bg-dark text-white
+   {% endif %}">
+
+    <i class="bi bi-calendar-event me-2"></i>
+
+    Elections
+
+</a>
+
+        <a href="{% url 'admin_students' %}"
+           class="list-group-item list-group-item-action bg-dark text-white border-0 py-3">
+
+            <i class="bi bi-people me-2"></i>
+
+            Students
+
+        </a>
+
+        <a href="{% url 'admin_candidates' %}"
+           class="list-group-item list-group-item-action bg-dark text-white border-0 py-3">
+
+            <i class="bi bi-person-badge me-2"></i>
+
+            Candidates
+
+        </a>
+
+
+        <a href="{% url 'admin_votes' %}"
+           class="list-group-item list-group-item-action bg-dark text-white border-0 py-3">
+
+            <i class="bi bi-check2-square me-2"></i>
+
+            Votes
+
+        </a>
+
+        <a href="{% url 'admin_results' %}"
+           class="list-group-item list-group-item-action bg-dark text-white border-0 py-3">
+
+            <i class="bi bi-bar-chart-line me-2"></i>
+
+            Results
+
+        </a>
+
+        <a href="{% url 'import_students' %}"
+           class="list-group-item list-group-item-action bg-dark text-white border-0 py-3">
+
+            <i class="bi bi-upload me-2"></i>
+
+            Import Students
+
+        </a>
+
+    </div>
+
+    <!-- Bottom Menu -->
+    <div class="border-top border-secondary">
+
+ 
+
+        <a href="/accounts/logout/"
+           class="list-group-item list-group-item-action bg-danger text-white border-0 py-3">
+
+            <i class="bi bi-box-arrow-right me-2"></i>
+
+            Logout
+
+        </a>
+
+    </div>
+
+</div>

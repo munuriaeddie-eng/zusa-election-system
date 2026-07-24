@@ -1,0 +1,248 @@
+{% extends "adminpanel/base.html" %}
+{% load static %}
+
+{% block title %}
+Manage Candidates
+{% endblock %}
+
+{% block page_title %}
+Manage Candidates
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+   <div class="card-header bg-primary text-white">
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h4 class="mb-1">
+
+                {{ election.title }}
+
+            </h4>
+
+            <small>
+
+                {{ election.get_election_type_display }}
+
+            </small>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'admin_election_details' election.id %}"
+               class="btn btn-light btn-sm">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="card-body">
+
+<div class="card-body">
+
+    {% if election.status != "draft" %}
+
+    <div class="alert alert-warning d-flex align-items-center mb-4">
+
+        <i class="bi bi-lock-fill me-2"></i>
+
+        <div>
+            <strong>Candidate management is locked.</strong><br>
+
+            This election is currently
+            <strong>{{ election.get_status_display }}</strong>.
+
+            Candidates cannot be added, edited, or deleted.
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div class="row mb-4">
+
+
+        <div class="row mb-4">
+
+    <div class="col-md-4">
+
+        <div class="alert alert-primary mb-0">
+
+            <strong>Total Candidates</strong>
+
+            <h3 class="mb-0">
+
+                {{ candidates|length }}
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="alert alert-success mb-0">
+
+            <strong>Status</strong>
+
+            <h5 class="mb-0">
+
+                {{ election.status|title }}
+
+            </h5>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4 text-end">
+
+       {% if election.status == "draft" %}
+
+<a href="{% url 'add_candidate' election.id %}" class="btn btn-primary">
+    Add Candidate
+</a>
+
+{% endif %}
+    </div>
+
+</div>
+
+        <table class="table table-hover align-middle">
+
+            <thead>
+
+    <tr>
+
+        <th>Photo</th>
+
+        <th>Name</th>
+
+        <th>Position</th>
+
+        <th>Course</th>
+
+        <th>Year</th>
+
+        <th class="text-center">
+
+            Actions
+
+        </th>
+
+    </tr>
+
+</thead>
+            <tbody>
+
+                {% for candidate in candidates %}
+
+                <tr>
+
+                    <td width="80">
+
+                        {% if candidate.photo %}
+
+                            <img src="{{ candidate.photo.url }}"
+                                 class="rounded-circle"
+                                 width="50"
+                                 height="50"
+                                 style="object-fit:cover;">
+
+                        {% else %}
+
+                            <img src="{% static 'images/default-user.png' %}"
+                                 class="rounded-circle"
+                                 width="50"
+                                 height="50"
+                                 style="object-fit:cover;">
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.student.full_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.position.name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.student.course }}
+
+                    </td>
+
+                    <td>
+
+                        Year {{ candidate.student.year }}
+
+                    </td>
+
+                    <td class="text-center">
+
+ {% if election.status == "draft" %}
+
+<a href="{% url 'edit_candidate' candidate.id %}"
+   class="btn btn-sm btn-outline-primary">
+
+    <i class="bi bi-pencil-square"></i>
+
+</a>
+
+<a href="{% url 'delete_candidate' candidate.id %}"
+   class="btn btn-sm btn-outline-danger">
+
+    <i class="bi bi-trash"></i>
+
+</a>
+
+{% endif %}
+</td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6" class="text-center">
+
+                        No candidates found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Add Candidate
+{% endblock %}
+
+{% block page_title %}
+Add Candidate
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-primary text-white">
+
+        <h4 class="mb-0">
+
+            Add Candidate to "{{ election.title }}"
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button
+                type="submit"
+                class="btn btn-success">
+
+                Save Candidate
+
+            </button>
+
+            <a
+                href="{% url 'admin_election_candidates' election.id %}"
+                class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

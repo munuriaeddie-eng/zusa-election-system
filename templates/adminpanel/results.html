@@ -1,0 +1,157 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Election Results
+{% endblock %}
+
+
+{% block page_title %}
+Election Results
+{% endblock %}
+
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+
+    <div class="card-header bg-success text-white">
+
+        <h4 class="mb-0">
+            Election Results
+        </h4>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <table class="table table-hover align-middle">
+
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>Election</th>
+
+                    <th>Type</th>
+
+                    <th>Status</th>
+
+                    <th class="text-center">
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for election in elections %}
+
+
+                <tr>
+
+
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+
+                    <td>
+                        {{ election.title }}
+                    </td>
+
+
+                    <td>
+                        {{ election.get_election_type_display }}
+                    </td>
+
+
+                    <td>
+
+                        {% if election.status == "finalized" %}
+
+                            <span class="badge bg-success">
+                                Finalized
+                            </span>
+
+                        {% elif election.status == "closed" %}
+
+                            <span class="badge bg-warning">
+                                Closed
+                            </span>
+
+                        {% elif election.status == "active" %}
+
+                            <span class="badge bg-primary">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Draft
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="text-center">
+
+
+                       <a href="{% url 'admin_election_results' election.id %}"
+   class="btn btn-success btn-sm">
+
+    <i class="bi bi-bar-chart-fill"></i>
+
+    View Results
+
+</a>
+
+
+                    </td>
+
+
+                </tr>
+
+
+            {% empty %}
+
+
+                <tr>
+
+                    <td colspan="5" class="text-center">
+
+                        No elections found.
+
+                    </td>
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

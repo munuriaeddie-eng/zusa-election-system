@@ -1,0 +1,129 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Edit Election
+{% endblock %}
+
+{% block page_title %}
+Edit Election
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+
+                <h4 class="mb-0">
+
+                    Edit Election
+
+                </h4>
+
+                <a href="{% url 'admin_elections' %}"
+                   class="btn btn-dark btn-sm">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Back
+
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Election Title
+
+                        </label>
+
+                        {{ form.title }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Election Type
+
+                        </label>
+
+                        {{ form.election_type }}
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+
+                                Start Date & Time
+
+                            </label>
+
+                            {{ form.start_date }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+
+                                End Date & Time
+
+                            </label>
+
+                            {{ form.end_date }}
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a href="{% url 'admin_elections' %}"
+                           class="btn btn-secondary">
+
+                            Cancel
+
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-warning">
+
+                            <i class="bi bi-pencil-square"></i>
+
+                            Update Election
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

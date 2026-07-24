@@ -1,0 +1,91 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Edit Position
+{% endblock %}
+
+{% block page_title %}
+Edit Position
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-7">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-warning text-dark">
+
+                <h4 class="mb-0">
+
+                    Edit Position
+
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Position Name
+
+                        </label>
+
+                        {{ form.name }}
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label">
+
+                            Election Type
+
+                        </label>
+
+                        {{ form.election_type }}
+
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+
+                        <a href="{% url 'admin_positions' %}"
+                           class="btn btn-secondary">
+
+                            <i class="bi bi-arrow-left"></i>
+
+                            Back
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-warning">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Update Position
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

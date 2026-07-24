@@ -1,0 +1,93 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Delete Candidate
+{% endblock %}
+
+{% block page_title %}
+Delete Candidate
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-danger text-white">
+
+        <h4 class="mb-0">
+
+            Confirm Delete
+
+        </h4>
+
+    </div>
+
+
+    <div class="card-body text-center">
+
+        <p class="fs-5">
+
+            Are you sure you want to remove:
+
+        </p>
+
+
+        <h4 class="text-danger">
+
+            {{ candidate.student.full_name }}
+
+        </h4>
+
+
+        <p>
+
+            Position:
+            <strong>
+                {{ candidate.position.name }}
+            </strong>
+
+        </p>
+
+
+        <p>
+
+            Election:
+            <strong>
+                {{ candidate.election.title }}
+            </strong>
+
+        </p>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <button
+                type="submit"
+                class="btn btn-danger">
+
+                <i class="bi bi-trash"></i>
+
+                Delete Candidate
+
+            </button>
+
+
+            <a
+                href="{% url 'admin_election_candidates' candidate.election.id %}"
+                class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

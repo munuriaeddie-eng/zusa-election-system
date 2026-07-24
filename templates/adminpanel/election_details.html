@@ -1,0 +1,569 @@
+{% extends "adminpanel/base.html" %}
+{% load static %}
+
+
+{% block title %}
+Election Details
+{% endblock %}
+
+{% block page_title %}
+Election Details
+{% endblock %}
+
+{% block content %}
+
+<!-- Election Information -->
+
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-primary text-white">
+
+                <h4 class="mb-0">
+
+                    {{ election.title }}
+
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-3">
+
+                        <strong>Election Type</strong>
+
+                        <br>
+
+                        {{ election.get_election_type_display }}
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Status</strong>
+
+                        <br>
+
+                        <span class="badge bg-success">
+
+                            {{ election.status|title }}
+
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Starts</strong>
+
+                        <br>
+
+                        {{ election.start_date }}
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>Ends</strong>
+
+                        <br>
+
+                        {{ election.end_date }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Election Controls -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-dark text-white">
+
+        <h5 class="mb-0">
+
+            Election Controls
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if election.status == "draft" %}
+
+            <a href="{% url 'start_election' election.id %}"
+               class="btn btn-success">
+
+                <i class="bi bi-play-fill"></i>
+
+                Start Election
+
+            </a>
+
+        {% endif %}
+
+        {% if election.status == "active" %}
+
+            <a href="{% url 'close_election' election.id %}"
+               class="btn btn-warning">
+
+                <i class="bi bi-stop-fill"></i>
+
+                Close Election
+
+            </a>
+
+        {% endif %}
+
+        {% if election.status == "closed" %}
+
+            <a href="{% url 'finalize_election' election.id %}"
+               class="btn btn-danger">
+
+                <i class="bi bi-check-circle"></i>
+
+                Finalize Election
+
+            </a>
+
+        {% endif %}
+
+        <a href="{% url 'admin_election_results' election.id %}"
+           class="btn btn-primary">
+
+            <i class="bi bi-bar-chart-line"></i>
+
+            View Results
+
+        </a>
+
+        <hr>
+
+        <h6 class="mb-3">
+
+            Management
+
+        </h6>
+
+        <div class="d-flex flex-wrap gap-2">
+
+           <a href="{% url 'admin_election_candidates' election.id %}"
+   class="btn btn-outline-primary">
+
+    <i class="bi bi-people"></i>
+
+    Manage Candidates
+
+</a>
+          <a href="{% url 'admin_election_positions' election.id %}"
+   class="btn btn-outline-success">
+
+    <i class="bi bi-award"></i>
+
+    Manage Positions
+
+</a>
+
+            <a href="#"
+               class="btn btn-outline-warning">
+
+                <i class="bi bi-person-check"></i>
+
+                View Voters
+
+            </a>
+
+            <a href="{% url 'admin_election_results' election.id %}"
+               class="btn btn-outline-dark">
+
+                <i class="bi bi-bar-chart"></i>
+
+                Live Results
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Statistics -->
+
+<div class="row mb-4">
+
+   <div class="col-md-3">
+
+    <div class="card border-0 shadow-sm bg-primary text-white">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h6 class="mb-2">
+
+                        Candidates
+
+                    </h6>
+
+                    <h2 class="fw-bold">
+
+                        {{ candidate_count }}
+
+                    </h2>
+
+                </div>
+
+                <i class="bi bi-people-fill display-5"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <h1 class="text-success">
+
+                    {{ vote_count }}
+
+                </h1>
+
+                <h6>Votes Cast</h6>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <h1 class="text-warning">
+
+                    {{ position_count }}
+
+                </h1>
+
+                <h6>Positions</h6>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+{% if election.status == "draft" %}
+
+    <span class="badge bg-secondary">
+        Draft
+    </span>
+
+{% elif election.status == "active" %}
+
+    <span class="badge bg-success">
+        Active
+    </span>
+
+{% elif election.status == "closed" %}
+
+    <span class="badge bg-warning text-dark">
+        Closed
+    </span>
+
+{% elif election.status == "finalized" %}
+
+    <span class="badge bg-primary">
+        Finalized
+    </span>
+
+{% endif %}
+
+                <h6>Current Status</h6>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Election Progress -->
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-info text-white">
+
+        <h5 class="mb-0">
+
+            Election Progress
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-3 text-center">
+
+                <h3 class="text-primary">
+
+                    {{ eligible_voters }}
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Eligible Voters
+
+                </small>
+
+            </div>
+
+            <div class="col-md-3 text-center">
+
+                <h3 class="text-success">
+
+                    {{ vote_count }}
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Votes Cast
+
+                </small>
+
+            </div>
+
+            <div class="col-md-3 text-center">
+
+                <h3 class="text-warning">
+
+                    {{ maximum_votes }}
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Maximum Possible Votes
+
+                </small>
+
+            </div>
+
+            <div class="col-md-3 text-center">
+
+                <h3 class="text-danger">
+
+                    {{ progress }}%
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Overall Progress
+
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="progress mt-4" style="height: 25px;">
+
+            <div
+                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                role="progressbar"
+                style="width: {{ progress }}%;"
+                aria-valuenow="{{ progress }}"
+                aria-valuemin="0"
+                aria-valuemax="100">
+
+                {{ progress }}%
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+<!-- Candidates -->
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-secondary text-white">
+
+        <h5 class="mb-0">
+
+            Candidates in this Election
+
+        </h5>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>Photo</th>
+
+                    <th>Candidate</th>
+
+                    <th>Position</th>
+
+                    <th>Course</th>
+
+                    <th>Year</th>
+
+                    <th class="text-center">Votes</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for candidate in candidates %}
+
+                <tr>
+
+                    <td width="90">
+
+                        {% if candidate.photo %}
+
+                            <img src="{{ candidate.photo.url }}"
+                                 class="rounded-circle"
+                                 width="60"
+                                 height="60"
+                                 style="object-fit:cover;">
+
+                        {% else %}
+
+                            <img src="{% static 'images/default-user.png' %}"
+                                 class="rounded-circle"
+                                 width="60"
+                                 height="60"
+                                 style="object-fit:cover;">
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            {{ candidate.student.full_name }}
+
+                        </strong>
+
+                        {% if candidate.total_votes == highest_votes and candidate.total_votes > 0 %}
+
+                            <span class="badge bg-warning text-dark ms-2">
+
+                                Leader
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.position.name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.student.course }}
+
+                    </td>
+
+                    <td>
+
+                        Year {{ candidate.student.year }}
+
+                    </td>
+
+                    <td class="text-center">
+
+                        <span class="badge bg-primary">
+
+                            {{ candidate.total_votes }}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6" class="text-center py-4">
+
+                        No candidates registered.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

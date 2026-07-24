@@ -1,0 +1,419 @@
+{% extends "adminpanel/base.html" %}
+{% block title %}Election Results Dashboard{% endblock %}
+{% block page_title %}Election Results{% endblock %}
+{% block content %}
+<div class="container-fluid">
+<div class="card shadow-sm border-0 mb-4">
+<div class="card-header bg-success text-white d-flex justify-content-between align-items-center flex-wrap">
+<div>
+<h2 class="mb-0"><i class="bi bi-bar-chart-fill"></i> {{ election.title }}</h2>
+<small>{{ election.get_election_type_display }} | {{ election.get_status_display }}</small>
+</div>
+<div class="d-flex gap-2">
+<a href="{% url 'admin_results' %}" class="btn btn-light btn-sm">Back</a>
+<button onclick="window.print()" class="btn btn-warning btn-sm">Print</button>
+<a href="{% url 'export_results_pdf' election.id %}" 
+   class="btn btn-danger btn-sm">
+    PDF
+</a>
+
+<a href="{% url 'export_results_csv' election.id %}" 
+   class="btn btn-primary btn-sm">
+    CSV
+</a>
+<button id="toggleLive" class="btn btn-success btn-sm">Start Live</button>
+</div>
+</div>
+<div class="card-body">
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="card text-center"><div class="card-body"><h6>Total Votes</h6><h2>{{ total_votes }}</h2></div></div></div>
+<div class="col-md-3"><div class="card text-center"><div class="card-body"><h6>Positions</h6><h2>{{ results|length }}</h2></div></div></div>
+<div class="col-md-3"><div class="card text-center"><div class="card-body"><h6>Status</h6><h2>{{ election.get_status_display }}</h2></div></div></div>
+<div class="col-md-3"><div class="card text-center"><div class="card-body"><h6>Updated</h6><span id="updated">Just now</span></div></div></div>
+</div>
+
+{% for section in results %}
+<div class="card mb-4 shadow-sm">
+<div class="card-header">
+<div class="d-flex justify-content-between">
+<div>
+<h4>{{ section.position.name }}</h4>
+<small>{{ section.total_candidates }} Candidates • {{ section.total_votes }} Votes</small>
+</div>
+{% if section.tie %}
+<span class="badge bg-warning">Tie</span>
+{% elif section.winner %}
+<span class="badge bg-success">Winner Declared</span>
+{% endif %}
+</div>
+</div>
+<div class="card-body">
+{% if section.tie %}
+<div class="alert alert-warning">Tie detected. No winner declared.</div>
+{% elif section.winner %}
+<div class="alert alert-success">🏆 Winner: <strong>{{ section.winner.student.full_name }}</strong></div>
+{% endif %}
+
+{% if section.candidates %}
+<div class="row">
+{% for candidate in section.candidates %}
+{% widthratio candidate.votes section.total_votes 100 as pct %}
+<div class="col-lg-6 mb-3">
+<div class="card h-100">
+<div class="card-body">
+<div class="row">
+<div class="col-3 text-center">
+{% if candidate.photo %}
+<img src="{{ candidate.photo.url }}" class="img-fluid rounded-circle" style="width:80px;height:80px;object-fit:cover;">
+{% else %}
+<i class="bi bi-person-circle fs-1"></i>
+{% endif %}
+</div>
+<div class="col-9">
+<h5>{{ candidate.student.full_name }}</h5>
+<p class="mb-1">{{ candidate.student.admission_no }}</p>
+<p class="mb-1">{{ candidate.student.course }}</p>
+<p>
+<strong id="votes-{{ candidate.id }}">
+    {{ candidate.votes }}
+</strong>
+ Votes
+</p>
+<div class="progress">
+<div class="progress-bar progress-bar-striped progress-bar-animated" style="width:{{ pct }}%">{{ pct }}%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="alert alert-secondary">No candidates found.</div>
+{% endif %}
+<div class="row mt-4">
+<div class="col-md-6">
+    <div style="height:300px;">
+        <canvas id="donut-{{ section.position_id }}"></canvas>
+    </div>
+</div>
+<div class="col-md-6">
+    <div style="height:300px;">
+        <canvas id="bar-{{ section.position_id }}"></canvas>
+    </div>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let timer = null;
+
+const btn = document.getElementById("toggleLive");
+
+const liveUrl = "{{ live_url }}";
+
+
+// -----------------------------
+// FETCH LIVE RESULTS
+// -----------------------------
+
+function updateLiveResults(){
+
+    fetch(liveUrl)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        console.log(data);
+
+
+        document.getElementById("updated").innerText =
+            new Date().toLocaleTimeString();
+
+
+
+        data.forEach(section => {
+
+
+            // Update vote numbers
+
+            section.candidates.forEach(candidate => {
+
+
+                const voteElement =
+                    document.getElementById(
+                        "votes-" + candidate.id
+                    );
+
+
+                if(voteElement){
+
+                    voteElement.innerText =
+                        candidate.votes + " Votes";
+
+                }
+
+
+            });
+
+
+
+            // Update charts
+
+            const labels = section.candidates.map(
+                candidate => candidate.name
+            );
+
+
+            const votes = section.candidates.map(
+                candidate => candidate.votes
+            );
+
+
+            const donut =
+                charts["donut-" + section.position_id];
+
+
+            const bar =
+                charts["bar-" + section.position_id];
+
+
+
+            if(donut){
+
+                donut.data.labels = labels;
+
+                donut.data.datasets[0].data = votes;
+
+                donut.update();
+
+            }
+
+
+
+            if(bar){
+
+                bar.data.labels = labels;
+
+                bar.data.datasets[0].data = votes;
+
+                bar.update();
+
+            }
+
+
+        });
+
+
+    })
+
+
+    .catch(error => {
+
+        console.log(
+            "Live update error:",
+            error
+        );
+
+    });
+
+}
+
+
+// -----------------------------
+// START / STOP LIVE
+// -----------------------------
+
+btn.onclick = function(){
+
+
+    if(timer){
+
+        clearInterval(timer);
+
+        timer = null;
+
+        btn.innerText = "Start Live";
+
+        return;
+
+    }
+
+
+
+    btn.innerText = "Stop Live";
+
+
+    updateLiveResults();
+
+
+    timer = setInterval(
+        updateLiveResults,
+        5000
+    );
+
+
+};
+
+
+// -----------------------------
+// CREATE RESULT CHARTS
+// -----------------------------
+
+const charts = {};
+
+{% for section in results %}
+
+const labels{{ section.position_id }} = [
+    {% for candidate in section.candidates %}
+        "{{ candidate.student.full_name }}",
+    {% endfor %}
+];
+
+
+const votes{{ section.position_id }} = [
+    {% for candidate in section.candidates %}
+        {{ candidate.votes }},
+    {% endfor %}
+];
+
+
+
+// DONUT CHART
+
+charts["donut-{{ section.position_id }}"] = new Chart(
+    document.getElementById(
+        "donut-{{ section.position_id }}"
+    ),
+    {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: labels{{ section.position_id }},
+
+            datasets: [
+                {
+                    label: "Votes",
+
+                    data: votes{{ section.position_id }}
+
+                }
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+
+                    position: "bottom"
+
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "{{ section.position.name }} Vote Distribution"
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+
+
+
+// BAR CHART
+
+charts["bar-{{ section.position_id }}"] = new Chart(
+    document.getElementById(
+        "bar-{{ section.position_id }}"
+    ),
+    {
+
+        type: "bar",
+
+        data: {
+
+            labels: labels{{ section.position_id }},
+
+            datasets: [
+
+                {
+
+                    label: "Votes",
+
+                    data: votes{{ section.position_id }}
+
+                }
+
+            ]
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        precision: 0
+
+                    }
+
+                }
+
+            },
+
+
+            plugins: {
+
+                title: {
+
+                    display: true,
+
+                    text: "{{ section.position.name }} Candidate Comparison"
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+
+{% endfor %}
+
+</script>
+{% endblock %}

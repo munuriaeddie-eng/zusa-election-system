@@ -1,0 +1,296 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Manage Students
+{% endblock %}
+
+{% block page_title %}
+Manage Students
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-primary text-white">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h4 class="mb-0">
+                    Student Management
+                </h4>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row mb-4">
+
+            <div class="col-md-3">
+
+                <div class="alert alert-primary mb-0">
+
+                    <strong>Total Students</strong>
+
+                    <h3 class="mb-0">
+
+                        {{ students|length }}
+
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-9">
+
+                <form method="get">
+
+                    <div class="row g-2">
+
+                        <div class="col-md-4">
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control"
+                                placeholder="Search student..."
+                                value="{{ search }}">
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <select
+                                name="role"
+                                class="form-select">
+
+                                <option value="">All Roles</option>
+
+                                <option value="student"
+                                    {% if role == "student" %}selected{% endif %}>
+                                    Student
+                                </option>
+
+                                <option value="delegate"
+                                    {% if role == "delegate" %}selected{% endif %}>
+                                    Delegate
+                                </option>
+
+                                <option value="leader"
+                                    {% if role == "leader" %}selected{% endif %}>
+                                    Leader
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <select
+                                name="verified"
+                                class="form-select">
+
+                                <option value="">Verification</option>
+
+                                <option value="true"
+                                    {% if verified == "true" %}selected{% endif %}>
+                                    Verified
+                                </option>
+
+                                <option value="false"
+                                    {% if verified == "false" %}selected{% endif %}>
+                                    Not Verified
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <select
+                                name="year"
+                                class="form-select">
+
+                                <option value="">All Years</option>
+
+                                <option value="1" {% if year == "1" %}selected{% endif %}>Year 1</option>
+                                <option value="2" {% if year == "2" %}selected{% endif %}>Year 2</option>
+                                <option value="3" {% if year == "3" %}selected{% endif %}>Year 3</option>
+                                <option value="4" {% if year == "4" %}selected{% endif %}>Year 4</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2 d-grid">
+
+                            <button
+                                class="btn btn-primary"
+                                type="submit">
+
+                                <i class="bi bi-search"></i>
+
+                                Search
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>Admission No</th>
+
+                    <th>Name</th>
+
+                    <th>Email</th>
+
+                    <th>Course</th>
+
+                    <th>Year</th>
+
+                    <th>Role</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <td>
+
+                        {{ student.admission_no }}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            {{ student.full_name }}
+
+                        </strong>
+
+                    </td>
+
+                    <td>
+
+                        {{ student.email }}
+
+                    </td>
+
+                    <td>
+
+                        {{ student.course }}
+
+                    </td>
+
+                    <td>
+
+                        Year {{ student.year }}
+
+                    </td>
+
+                    <td>
+
+                        {% if student.role == "student" %}
+
+                            <span class="badge bg-secondary">
+
+                                Student
+
+                            </span>
+
+                        {% elif student.role == "delegate" %}
+
+                            <span class="badge bg-primary">
+
+                                Delegate
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-success">
+
+                                Leader
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if student.is_verified %}
+
+                            <span class="badge bg-success">
+
+                                Verified
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-warning text-dark">
+
+                                Pending
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7" class="text-center py-4">
+
+                        No students found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

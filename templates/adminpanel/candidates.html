@@ -1,0 +1,279 @@
+{% extends "adminpanel/base.html" %}
+{% load static %}
+
+{% block title %}
+Manage Candidates
+{% endblock %}
+
+{% block page_title %}
+Manage Candidates
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-primary text-white">
+
+        <h4 class="mb-0">
+
+            Candidate Management
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row mb-4">
+
+            <div class="col-md-3">
+
+                <div class="alert alert-primary mb-0">
+
+                    <strong>Total Candidates</strong>
+
+                    <h3 class="mb-0">
+
+                        {{ candidates|length }}
+
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-9">
+
+                <form method="get">
+
+                    <div class="row g-2">
+
+                        <div class="col-md-4">
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control"
+                                placeholder="Search candidate..."
+                                value="{{ search }}">
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <select
+                                name="election"
+                                class="form-select">
+
+                                <option value="">All Elections</option>
+
+                                {% for election in elections %}
+
+                                <option
+                                    value="{{ election.id }}"
+                                    {% if selected_election == election.id|stringformat:"s" %}selected{% endif %}>
+
+                                    {{ election.title }}
+
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <select
+                                name="position"
+                                class="form-select">
+
+                                <option value="">All Positions</option>
+
+                                {% for position in positions %}
+
+                                <option
+                                    value="{{ position.id }}"
+                                    {% if selected_position == position.id|stringformat:"s" %}selected{% endif %}>
+
+                                    {{ position.name }}
+
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2 d-grid">
+
+                            <button
+                                class="btn btn-primary"
+                                type="submit">
+
+                                <i class="bi bi-search"></i>
+
+                                Search
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>Photo</th>
+
+                    <th>Student</th>
+
+                    <th>Election</th>
+
+                    <th>Position</th>
+
+                    <th>Course</th>
+
+                    <th>Role</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for candidate in candidates %}
+
+                <tr>
+
+                    <td width="70">
+
+                        {% if candidate.photo %}
+
+                            <img
+                                src="{{ candidate.photo.url }}"
+                                width="50"
+                                height="50"
+                                class="rounded-circle"
+                                style="object-fit:cover;">
+
+                        {% else %}
+
+                            <img
+                                src="{% static 'images/default-user.png' %}"
+                                width="50"
+                                height="50"
+                                class="rounded-circle"
+                                style="object-fit:cover;">
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            {{ candidate.student.full_name }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ candidate.student.admission_no }}
+
+                        </small>
+
+                    </td>
+
+                    <td>
+
+                        <span class="badge bg-primary">
+
+                            {{ candidate.election.title }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.position.name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ candidate.student.course }}
+
+                    </td>
+
+                    <td>
+
+                        {% if candidate.student.role == "student" %}
+
+                            <span class="badge bg-secondary">
+
+                                Student
+
+                            </span>
+
+                        {% elif candidate.student.role == "delegate" %}
+
+                            <span class="badge bg-primary">
+
+                                Delegate
+
+                            </span>
+
+                        {% elif candidate.student.role == "leader" %}
+
+                            <span class="badge bg-success">
+
+                                Leader
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6" class="text-center py-4">
+
+                        No candidates found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

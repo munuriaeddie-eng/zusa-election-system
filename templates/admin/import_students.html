@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<h1>Import Students</h1>
+
+<hr>
+
+<form method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    <p>
+        Select a CSV file containing student records.
+    </p>
+
+    <input
+        type="file"
+        name="csv_file"
+        accept=".csv"
+        required
+    >
+
+    <br><br>
+
+    <button
+        type="submit"
+        class="default"
+    >
+        Import CSV
+    </button>
+
+</form>
+
+{% endblock %}

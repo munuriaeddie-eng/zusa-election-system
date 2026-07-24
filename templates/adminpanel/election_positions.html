@@ -1,0 +1,84 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Election Positions
+{% endblock %}
+
+{% block page_title %}
+Election Positions
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+
+            {{ election.title }} Positions
+
+        </h4>
+
+        <a href="{% url 'add_position' election.id %}"
+           class="btn btn-light">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Add Position
+
+        </a>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-hover mb-0">
+
+            <thead>
+
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Election Type</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for position in positions %}
+
+                <tr>
+
+                    <td>{{ position.name }}</td>
+
+                    <td>{{ position.get_election_type_display }}</td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="2" class="text-center">
+
+                        No positions created.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
