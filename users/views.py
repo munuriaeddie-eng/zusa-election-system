@@ -1559,23 +1559,20 @@ def admin_election_candidates(request, election_id):
     )
     
 @staff_member_required
-def add_candidate(request, election_id):
+from django.http import HttpResponse
+import traceback
 
+def add_candidate(request, election_id):
     election = get_object_or_404(
         Election,
         id=election_id,
-        
     )
-    
-    
-    
-    if election.status in ["active", "closed", "finalized"]:
 
+    if election.status in ["active", "closed", "finalized"]:
         messages.error(
             request,
             "Candidates cannot be added once the election has started."
         )
-
         return redirect(
             "admin_election_candidates",
             election.id,
@@ -1584,31 +1581,32 @@ def add_candidate(request, election_id):
     if request.method == "POST":
 
         form = CandidateForm(
-        request.POST,
-        request.FILES,
-        election=election,
-    )
+            request.POST,
+            request.FILES,
+            election=election,
+        )
 
-        if form.is_valid():
+        try:
+            if form.is_valid():
 
-            candidate = form.save(
-                commit=False
-            )
+                candidate = form.save(commit=False)
+                candidate.election = election
+                candidate.save()
 
-            candidate.election = election
+                return redirect(
+                    "admin_election_candidates",
+                    election.id,
+                )
+            else:
+                return HttpResponse(form.errors)
 
-            candidate.save()
-
-            return redirect(
-                "admin_election_candidates",
-                election.id,
+        except Exception:
+            return HttpResponse(
+                "<pre>" + traceback.format_exc() + "</pre>"
             )
 
     else:
-
-        form = CandidateForm(
-    election=election
-)
+        form = CandidateForm(election=election)
 
     return render(
         request,
