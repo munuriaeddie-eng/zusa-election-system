@@ -350,116 +350,12 @@ def import_students(request):
 # DASHBOARD
 # --------------------------------------------------
 
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def dashboard(request):
-
-    student = Student.objects.filter(
-        user=request.user
-    ).first()
-
-    if not student:
-        return redirect("register_student")
-
-    if not student.is_verified:
-        return render(
-            request,
-            "pending_verification.html"
-        )
-
-    active_election = Election.objects.filter(
-        status="active"
-    ).first()
-
-    finalized_election = (
-        Election.objects.filter(
-            status="finalized"
-        )
-        .order_by("-end_date")
-        .first()
-    )
-
-    election = active_election if active_election else finalized_election
-
-    candidates_by_position = []
-    voted_positions = []
-    total_positions = 0
-    completed_positions = 0
-    remaining_positions = 0
-    progress = 0
-    time_remaining = None
-    published_results = []
-
-    if election and election.status == "finalized":
-        published_results = get_all_results(election)
-
-    if election:
-
-        positions = Position.objects.filter(
-            election_type=election.election_type
-        ).order_by("id")
-
-        for position in positions:
-
-            candidates = Candidate.objects.filter(
-                election=election,
-                position=position
-            )
-
-            candidates_by_position.append({
-                "position": position,
-                "candidates": candidates,
-            })
-
-        voted_positions = list(
-            Vote.objects.filter(
-                voter=student,
-                election=election
-            ).values_list(
-                "position_id",
-                flat=True
-            )
-        )
-
-        total_positions = positions.count()
-        completed_positions = len(voted_positions)
-        remaining_positions = total_positions - completed_positions
-
-        if total_positions > 0:
-            progress = int(
-                (completed_positions / total_positions) * 100
-            )
-
-        remaining = election.end_date - timezone.now()
-
-        if remaining.total_seconds() > 0:
-            days = remaining.days
-            hours = remaining.seconds // 3600
-            minutes = (remaining.seconds % 3600) // 60
-
-            time_remaining = (
-                f"{days} Day(s) "
-                f"{hours} Hour(s) "
-                f"{minutes} Minute(s)"
-            )
-        else:
-            time_remaining = "Election Ended"
-
-    return render(
-        request,
-        "dashboard.html",
-        {
-            "student": student,
-            "election": election,
-            "candidates_by_position": candidates_by_position,
-            "voted_positions": voted_positions,
-            "total_positions": total_positions,
-            "completed_positions": completed_positions,
-            "remaining_positions": remaining_positions,
-            "progress": progress,
-            "published_results": published_results,
-            "time_remaining": time_remaining,
-        }
-    )
+    return HttpResponse("Dashboard works")
 
 # --------------------------------------------------
 # VOTING RULES
