@@ -361,37 +361,32 @@ def dashboard(request):
         return redirect("register_student")
 
     if not student.is_verified:
-
         return render(
             request,
             "pending_verification.html"
         )
 
     active_election = Election.objects.filter(
-    status="active"
-        ).first()
+        status="active"
+    ).first()
 
-    finalized_election = Election.objects.filter(
+    finalized_election = (
+        Election.objects.filter(
             status="finalized"
-        ).order_by("-end_date").first()
+        )
+        .order_by("-end_date")
+        .first()
+    )
 
     election = active_election if active_election else finalized_election
 
     candidates_by_position = []
-
     voted_positions = []
-
     total_positions = 0
-
     completed_positions = 0
-
     remaining_positions = 0
-
     progress = 0
-
     time_remaining = None
-
-
     published_results = []
 
     if election and election.status == "finalized":
@@ -410,12 +405,10 @@ def dashboard(request):
                 position=position
             )
 
-            candidates_by_position.append(
-                {
-                    "position": position,
-                    "candidates": candidates
-                }
-            )
+            candidates_by_position.append({
+                "position": position,
+                "candidates": candidates,
+            })
 
         voted_positions = list(
             Vote.objects.filter(
@@ -428,27 +421,19 @@ def dashboard(request):
         )
 
         total_positions = positions.count()
-
         completed_positions = len(voted_positions)
-
-        remaining_positions = (
-            total_positions - completed_positions
-        )
+        remaining_positions = total_positions - completed_positions
 
         if total_positions > 0:
-
             progress = int(
                 (completed_positions / total_positions) * 100
             )
 
-            remaining = election.end_date - timezone.now()
+        remaining = election.end_date - timezone.now()
 
         if remaining.total_seconds() > 0:
-
             days = remaining.days
-
             hours = remaining.seconds // 3600
-
             minutes = (remaining.seconds % 3600) // 60
 
             time_remaining = (
@@ -456,9 +441,7 @@ def dashboard(request):
                 f"{hours} Hour(s) "
                 f"{minutes} Minute(s)"
             )
-
         else:
-
             time_remaining = "Election Ended"
 
     return render(
@@ -474,7 +457,7 @@ def dashboard(request):
             "remaining_positions": remaining_positions,
             "progress": progress,
             "published_results": published_results,
-            "time_remaining": time_remaining
+            "time_remaining": time_remaining,
         }
     )
 
@@ -546,7 +529,7 @@ def confirm_vote(request, candidate_id, election_id, position_id):
 
 
 # -------------------------
-# CAST VOTE
+# VOTE
 # -------------------------
 @login_required
 def cast_vote(request, candidate_id, election_id, position_id):
