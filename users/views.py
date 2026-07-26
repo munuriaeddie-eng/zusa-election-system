@@ -18,6 +18,7 @@ from .forms import (
 )
 from django.db.models import Q
 
+
 import csv
 from django.contrib.auth import logout
 
@@ -1559,9 +1560,6 @@ def admin_election_candidates(request, election_id):
     )
     
 @staff_member_required
-from django.http import HttpResponse
-import traceback
-
 def add_candidate(request, election_id):
     election = get_object_or_404(
         Election,
