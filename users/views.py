@@ -350,13 +350,18 @@ def import_students(request):
 # --------------------------------------------------
 # DASHBOARD
 # --------------------------------------------------
-
+import traceback
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def dashboard(request):
-    return HttpResponse("Dashboard works")
+    try:
+        # paste your ORIGINAL dashboard code here
+        ...
+    except Exception:
+        return HttpResponse(
+            "<pre>" + traceback.format_exc() + "</pre>"
+        )
 
 # --------------------------------------------------
 # VOTING RULES
