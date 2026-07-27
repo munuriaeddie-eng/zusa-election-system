@@ -350,19 +350,120 @@ def import_students(request):
 # --------------------------------------------------
 # DASHBOARD
 # --------------------------------------------------
-import traceback
-from django.http import HttpResponse
 
 @login_required
 def dashboard(request):
-    try:
-        # paste your ORIGINAL dashboard code here
-        ...
-    except Exception:
-        return HttpResponse(
-            "<pre>" + traceback.format_exc() + "</pre>"
+
+    student = Student.objects.filter(
+        user=request.user
+    ).first()
+
+    if not student:
+        return redirect("register_student")
+
+    if not student.is_verified:
+        return render(
+            request,
+            "pending_verification.html"
         )
 
+    active_election = Election.objects.filter(
+        status="active"
+    ).first()
+
+    finalized_election = (
+        Election.objects.filter(
+            status="finalized"
+        )
+        .order_by("-end_date")
+        .first()
+    )
+
+    election = active_election if active_election else finalized_election
+
+    candidates_by_position = []
+    voted_positions = []
+    total_positions = 0
+    completed_positions = 0
+    remaining_positions = 0
+    progress = 0
+    time_remaining = None
+    published_results = []
+
+    if election and election.status == "finalized":
+        published_results = get_all_results(election)
+
+    if election:
+
+        positions = Position.objects.filter(
+            election=election
+        ).order_by("id")
+
+        for position in positions:
+
+            candidates = Candidate.objects.filter(
+                election=election,
+                position=position,
+            )
+
+            candidates_by_position.append({
+                "position": position,
+                "candidates": candidates,
+            })
+
+        voted_positions = list(
+            Vote.objects.filter(
+                voter=student,
+                election=election,
+            ).values_list(
+                "position_id",
+                flat=True,
+            )
+        )
+
+        total_positions = positions.count()
+        completed_positions = len(voted_positions)
+        remaining_positions = total_positions - completed_positions
+
+        if total_positions > 0:
+            progress = int(
+                (completed_positions / total_positions) * 100
+            )
+
+        remaining = election.end_date - timezone.now()
+
+        if remaining.total_seconds() > 0:
+
+            days = remaining.days
+            hours = remaining.seconds // 3600
+            minutes = (remaining.seconds % 3600) // 60
+
+            time_remaining = (
+                f"{days} Day(s) "
+                f"{hours} Hour(s) "
+                f"{minutes} Minute(s)"
+            )
+
+        else:
+
+            time_remaining = "Election Ended"
+
+    return render(
+        request,
+        "dashboard.html",
+        {
+            "student": student,
+            "election": election,
+            "candidates_by_position": candidates_by_position,
+            "voted_positions": voted_positions,
+            "total_positions": total_positions,
+            "completed_positions": completed_positions,
+            "remaining_positions": remaining_positions,
+            "progress": progress,
+            "published_results": published_results,
+            "time_remaining": time_remaining,
+        },
+    )
 # --------------------------------------------------
 # VOTING RULES
 # --------------------------------------------------
@@ -1532,44 +1633,38 @@ def admin_election_details(request, election_id):
         context,
     )
     
-import traceback
-from django.http import HttpResponse
-
+@staff_member_required
 def admin_election_candidates(request, election_id):
-    try:
-        election = get_object_or_404(
-            Election,
-            id=election_id,
-        )
 
-        candidates = (
-            Candidate.objects.select_related(
-                "student",
-                "position",
-            )
-            .filter(
-                election=election,
-            )
-            .order_by(
-                "position__name",
-                "student__full_name",
-            )
-        )
+    election = get_object_or_404(
+        Election,
+        id=election_id,
+    )
 
-        return render(
-            request,
-            "adminpanel/election_candidates.html",
-            {
-                "election": election,
-                "candidates": candidates,
-                "active_page": "elections",
-            },
+    candidates = (
+        Candidate.objects.select_related(
+            "student",
+            "position",
         )
+        .filter(
+            election=election,
+        )
+        .order_by(
+            "position__name",
+            "student__full_name",
+        )
+    )
 
-    except Exception:
-        return HttpResponse(
-            "<pre>" + traceback.format_exc() + "</pre>"
-        )
+    return render(
+        request,
+        "adminpanel/election_candidates.html",
+        {
+            "election": election,
+            "candidates": candidates,
+            "active_page": "elections",
+        },
+    )
+    
 @staff_member_required
 def add_candidate(request, election_id):
     election = get_object_or_404(
