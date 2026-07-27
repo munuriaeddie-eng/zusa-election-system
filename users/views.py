@@ -1532,38 +1532,44 @@ def admin_election_details(request, election_id):
         context,
     )
     
-@staff_member_required
+import traceback
+from django.http import HttpResponse
+
 def admin_election_candidates(request, election_id):
-
-    election = get_object_or_404(
-        Election,
-        id=election_id,
-    )
-
-    candidates = (
-        Candidate.objects.select_related(
-            "student",
-            "position",
+    try:
+        election = get_object_or_404(
+            Election,
+            id=election_id,
         )
-        .filter(
-            election=election,
-        )
-        .order_by(
-            "position__name",
-            "student__full_name",
-        )
-    )
 
-    return render(
-        request,
-        "adminpanel/election_candidates.html",
-        {
-            "election": election,
-            "candidates": candidates,
-            "active_page": "elections",
-        },
-    )
-    
+        candidates = (
+            Candidate.objects.select_related(
+                "student",
+                "position",
+            )
+            .filter(
+                election=election,
+            )
+            .order_by(
+                "position__name",
+                "student__full_name",
+            )
+        )
+
+        return render(
+            request,
+            "adminpanel/election_candidates.html",
+            {
+                "election": election,
+                "candidates": candidates,
+                "active_page": "elections",
+            },
+        )
+
+    except Exception:
+        return HttpResponse(
+            "<pre>" + traceback.format_exc() + "</pre>"
+        )
 @staff_member_required
 def add_candidate(request, election_id):
     election = get_object_or_404(
